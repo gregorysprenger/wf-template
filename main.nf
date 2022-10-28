@@ -138,10 +138,17 @@ workflow {
     )
 
     // Add versions to channel
-    // ch_versions = ch_versions.mix(REMOVE_PHIX.out.versions)
+    ch_versions = ch_versions.mix(INFILE_HANDLING.out.versions)
+
+    EXAMPLE_PROCESS (
+        INFILE_HANDLING.out.input,
+        INFILE_HANDLING.out.base
+    )
+
+    ch_versions = ch_versions.mix(EXAMPLE_PROCESS.out.versions)
 
     // PATTERN: Collate method version information
-    // ch_versions.collectFile(name: 'software_versions.yml', storeDir: params.logpath)
+    ch_versions.collectFile(name: 'software_versions.yml', storeDir: params.logpath)
 }
 
 /*
