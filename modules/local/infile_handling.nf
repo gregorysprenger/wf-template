@@ -5,6 +5,8 @@ process INFILE_HANDLING {
         pattern: ".command.*",
         saveAs: { filename -> "${basename}.${task.process}${filename}" }
 
+    container "ubuntu:focal"
+
     input:
         tuple val(basename), path(input)
 
@@ -13,6 +15,7 @@ process INFILE_HANDLING {
         val basename, emit: base
         path ".command.out"
         path ".command.err"
+        path "versions.yml", emit: versions
         
     shell:
         '''
@@ -21,7 +24,12 @@ process INFILE_HANDLING {
         msg "INFO: R1 = !{input[0]}"
         msg "INFO: R2 = !{input[1]}"
 
-        verify_file_minimum_size !{input[0]} 'fastq' '10M'
-        verify_file_minimum_size !{input[1]} 'fastq' '10M'
+        # verify_file_minimum_size !{input[0]} 'fastq' '10M'
+        # verify_file_minimum_size !{input[1]} 'fastq' '10M'
+
+        cat <<-END_VERSIONS > versions.yml
+        "!{task.process}":
+            ubuntu: $(cat /etc/issue)
+        END_VERSIONS
         '''
 }
